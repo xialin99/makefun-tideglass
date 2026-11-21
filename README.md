@@ -1,4 +1,4 @@
-# TIDEGLASS
+# 潮汐之镜 / TIDEGLASS
 
 [在线使用 / Open in browser](https://xialin99.github.io/makefun-tideglass/)
 
