@@ -79,7 +79,7 @@ const storageKey = "makefun-tideglass.language";
 let currentLanguage = 'zh';
 try { if (localStorage.getItem(storageKey) === 'en') currentLanguage = 'en'; } catch {}
 window.uiLanguage = currentLanguage;
-window.t = text => window.uiLanguage === 'zh' ? messages[text] ?? text : text;
+window.t = text => window.uiLanguage === 'zh' && Object.hasOwn(messages, text) ? messages[text] : text;
 const original = [];
 const title = document.title;
 const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);

@@ -68,5 +68,5 @@ createServer((request, response) => {
   });
   createReadStream(file).pipe(response);
 }).listen(port, '127.0.0.1', () => {
-  console.log(`game/ is on http://localhost:${port}`);
+  console.log(`${process.env.MAKEFUN_UI_LANG === 'en' ? 'Open the game at ' : '打开游戏：'}http://localhost:${port}`);
 });
