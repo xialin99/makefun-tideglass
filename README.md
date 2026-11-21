@@ -1,5 +1,7 @@
 # TIDEGLASS
 
+[在线使用 / Open in browser](https://xialin99.github.io/makefun-tideglass/)
+
 [中文](#中文) · [English](#english)
 
 ![Preview](screenshots/1-turbine-hall.jpg)
