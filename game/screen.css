@@ -30,3 +30,7 @@ article div{color:#bbd7dc;max-width:40ch;line-height:1.55;margin-bottom:21px}
   footer button{padding:4px 6px}
   article{padding:22px}
 }
+
+header .language-control{flex:none}
+header .language-control select{font:inherit}
+@media(max-width:480px){header .language-control select{max-width:7rem;font-size:12px}.signal{min-width:48px}}
