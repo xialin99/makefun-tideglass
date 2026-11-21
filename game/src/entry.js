@@ -5,6 +5,7 @@ import { cue, toggleSound, unlock } from './sound.js';
 import { createRenderer } from './rendering.js';
 import { outage, watchRange } from './relay.js';
 
+const { t } = window;
 const find = selector => document.querySelector(selector);
 const canvas = find('canvas');
 let mission = 0;
@@ -22,11 +23,11 @@ function loadProgress() {
 function missionButtons() {
   const observatory = find('#mission-one');
   observatory.setAttribute('aria-current', mission === 0 ? 'step' : 'false');
-  observatory.textContent = unlocked > 0 ? '1 · Observatory ✓' : '1 · Observatory';
+  observatory.textContent = unlocked > 0 ? t('1 · Observatory ✓') : t('1 · Observatory');
   const hall = find('#mission-two');
   hall.setAttribute('aria-current', mission === 1 ? 'step' : 'false');
   hall.disabled = unlocked < 1;
-  hall.textContent = unlocked < 1 ? '2 · Hall locked' : unlocked > 1 ? '2 · Hall ✓' : '2 · Turbine hall';
+  hall.textContent = unlocked < 1 ? t('2 · Hall locked') : unlocked > 1 ? t('2 · Hall ✓') : t('2 · Turbine hall');
 }
 
 function selectMission(index) {
@@ -36,6 +37,8 @@ function selectMission(index) {
   view = createRenderer(canvas, map);
   reset();
 }
+
+function updateLocation() { find('#location').textContent = `0${mission + 1} / ${t(map.name)}`; }
 
 function reset() {
   keys.clear();
@@ -49,7 +52,7 @@ function reset() {
     const target = guard.patrol[1];
     guard.angle = Math.atan2(target.y - guard.y, target.x - guard.x);
   });
-  find('#location').textContent = `0${mission + 1} / ${map.name}`;
+  updateLocation();
   missionButtons();
   find('#ending').hidden = true;
 }
@@ -91,13 +94,17 @@ function finish(result) {
     missionButtons();
   }
   cue(won ? 'exit' : 'alarm');
+  renderEnding(won);
+}
+
+function renderEnding(won) {
   const ending = find('#ending');
-  ending.querySelector('h2').textContent = won ? (map.relay ? 'The gate stays shut' : 'Signal ashore') : 'Gate sealed';
+  ending.querySelector('h2').textContent = won ? (map.relay ? t('The gate stays shut') : t('Signal ashore')) : t('Gate sealed');
   ending.querySelector('div').textContent = won
     ? map.relay
-      ? 'The relay readout names the override crew. The harbor pilot has the evidence and has ordered the gate closed before the morning tide.'
-      : 'Both recordings are ashore. They prove the floodgate was opened deliberately. The harbor pilot wants the relay readout before the next tide.'
-    : 'The watch saw you and dropped the flood barrier. Break line of sight behind masonry when the beam turns pink.';
+      ? t('The relay readout names the override crew. The harbor pilot has the evidence and has ordered the gate closed before the morning tide.')
+      : t('Both recordings are ashore. They prove the floodgate was opened deliberately. The harbor pilot wants the relay readout before the next tide.')
+    : t('The watch saw you and dropped the flood barrier. Break line of sight behind masonry when the beam turns pink.');
   find('#next').hidden = !won || mission !== 0;
   ending.hidden = false;
 }
@@ -123,11 +130,15 @@ function interact() {
   }
 }
 
+let muted = false;
+function renderMute() { find('#mute').textContent = muted ? t('M · Sound off') : t('M · Sound on'); }
 function mute() {
-  find('#mute').textContent = toggleSound() ? 'M · Sound off' : 'M · Sound on';
+  muted = toggleSound();
+  renderMute();
 }
 
 addEventListener('keydown', event => {
+  if (event.target instanceof HTMLSelectElement) return;
   if (event.code.startsWith('Arrow') || event.code === 'Space') event.preventDefault();
   unlock();
   keys.add(event.code);
@@ -188,19 +199,32 @@ function tick(dt) {
   for (const guard of state.guards) guard.range = watchRange(guard, map.relay, state);
 }
 
+function translateNotice(message) {
+  const recording = /^Recording (.+) secured\.$/.exec(message);
+  return window.uiLanguage === 'zh' && recording ? '已取得录音 ' + recording[1] + '。' : t(message);
+}
+addEventListener('ui-language-change', () => {
+  view = createRenderer(canvas, map);
+  updateLocation();
+  missionButtons();
+  renderMute();
+  if (state.result) renderEnding(state.result === 'clear');
+  hud();
+});
+
 function hud() {
   const suspicion = Math.max(...state.guards.map(g => g.suspicion));
-  const signal = state.guards.some(g => g.mode === 'tracking') ? 'IN SIGHT' :
-    state.guards.some(g => g.mode === 'investigating') ? 'SEARCHING' : 'UNSEEN';
+  const signal = state.guards.some(g => g.mode === 'tracking') ? t('IN SIGHT') :
+    state.guards.some(g => g.mode === 'investigating') ? t('SEARCHING') : t('UNSEEN');
   find('#manifest').textContent = map.relay
-    ? `READOUT ${state.tapes.size} / 1${outage(state) ? `  ·  DIM ${Math.ceil(outage(state))}s` : ''}`
-    : `RECORDINGS ${state.tapes.size} / 2`;
-  find('#objective').textContent = state.time < state.noticeUntil ? state.notice : map.relay
-    ? state.tapes.size ? 'Reach the escape ladder.' : outage(state)
-      ? 'Dim zone limits guard sight. The relay drew attention.'
-      : 'Copy the gate readout. Use the relay or take the bypass.'
-    : state.tapes.size === 2 ? 'Both logs secured · reach the tide gate.' : 'Recover both logs. Extract at the tide gate.';
-  find('#signal').textContent = state.result === 'caught' ? 'ALARM' : state.result === 'clear' ? 'EXTRACTED' : signal;
+    ? `${t('READOUT')} ${state.tapes.size} / 1${outage(state) ? `  ·  ${t('DIM')} ${Math.ceil(outage(state))}${window.uiLanguage === 'zh' ? ' 秒' : 's'}` : ''}`
+    : `${t('RECORDINGS')} ${state.tapes.size} / 2`;
+  find('#objective').textContent = state.time < state.noticeUntil ? translateNotice(state.notice) : map.relay
+    ? state.tapes.size ? t('Reach the escape ladder.') : outage(state)
+      ? t('Dim zone limits guard sight. The relay drew attention.')
+      : t('Copy the gate readout. Use the relay or take the bypass.')
+    : state.tapes.size === 2 ? t('Both logs secured · reach the tide gate.') : t('Recover both logs. Extract at the tide gate.');
+  find('#signal').textContent = state.result === 'caught' ? t('ALARM') : state.result === 'clear' ? t('EXTRACTED') : signal;
   find('#signal').dataset.alert = String(suspicion > .18);
   find('progress').value = suspicion;
 }

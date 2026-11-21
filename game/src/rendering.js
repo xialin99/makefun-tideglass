@@ -26,7 +26,7 @@ function label(c, text, x, y, color, size = 12, align = 'center') {
   c.fillStyle = color;
   c.font = `650 ${size}px "Segoe UI", sans-serif`;
   c.textAlign = align;
-  c.fillText(text, x, y);
+  c.fillText(window.t(text), x, y);
 }
 
 function light(c, x, y, r, color) {
@@ -188,7 +188,7 @@ function objects(c, map, state) {
     circle(c,t.x,t.y,25,'#0c2732',color,2);
     shape(c,[[t.x-13,t.y-8],[t.x+13,t.y-8],[t.x+13,t.y+8],[t.x-13,t.y+8]],'#234553',color);
     for (const dx of [-6,6]) circle(c,t.x+dx,t.y,3,ink,color);
-    marker(c,t.x,t.y-70,`${t.id} / ${t.name}`,taken ? 'RECOVERED' : t.detail ?? 'RECORDING · E',color);
+    marker(c,t.x,t.y-70,`${t.id} / ${window.t(t.name)}`,taken ? 'RECOVERED' : t.detail ?? 'RECORDING · E',color);
   }
   const [x,y] = map.exit;
   light(c,x,y,101,'#42e7b36f');
