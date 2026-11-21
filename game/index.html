@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08141f">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="./screen.css">
+<title>TIDEGLASS · Bellwether Observatory</title>
+<body>
+<main>
+  <canvas aria-label="Top-down map of Bellwether Observatory"></canvas>
+  <header>
+    <div><h1>TIDEGLASS</h1><p id="location">BELLWETHER OBSERVATORY</p></div>
+    <section><strong id="manifest">RECORDINGS 0 / 2</strong><p id="objective">Recover both logs. Extract at the tide gate.</p></section>
+    <section class="signal"><strong id="signal">UNSEEN</strong><progress max="1" value="0" aria-label="Guard suspicion"></progress></section>
+  </header>
+  <footer>
+    <span><kbd>WASD / ARROWS</kbd> Move</span><span><kbd>SHIFT</kbd> Crouch</span>
+    <span><kbd>E</kbd> Recover / exit</span><span><kbd>CLICK / Q</kbd> Toss</span>
+    <nav aria-label="Missions"><button id="mission-one" type="button">1 · Observatory</button>
+    <button id="mission-two" type="button" disabled>2 · Hall locked</button></nav>
+    <button id="mute" type="button">M · Sound on</button><button id="reset" type="button">R · Restart</button>
+  </footer>
+  <aside id="ending" hidden>
+    <article><p>BELLWETHER / FIELD REPORT</p><h2></h2><div></div>
+    <button id="retry" type="button">R · Run again</button>
+    <button id="next" type="button" hidden>2 · Enter turbine hall</button></article>
+  </aside>
+</main>
+<script type="module" src="./src/entry.js"></script>
+</body>
+</html>
